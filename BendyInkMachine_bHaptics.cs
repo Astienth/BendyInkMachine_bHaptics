@@ -2,8 +2,8 @@
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
-using UnityEngine;
 using MyBhapticsTactsuit;
+using TMG.Controls;
 
 namespace BendyInkMachine_bHaptics
 {
@@ -31,14 +31,120 @@ namespace BendyInkMachine_bHaptics
         }
     }
 
-    [HarmonyPatch(typeof(EntityPlayerLocal), "LateUpdate")]
-    public class bhaptics_OnUpdate
+    #region Player Physical Events
+
+    [HarmonyPatch(typeof(PlayerController), "Die")]
+    public class bhaptics_OnDeath
     {
         [HarmonyPostfix]
-        public static void Postfix(EntityPlayerLocal __instance)
+        public static void Postfix(PlayerController __instance)
         {
-            Plugin.currentHealth = Traverse.Create(__instance).Field("oldHealth").GetValue<float>();
+            Plugin.tactsuitVr.PlaybackHaptics("Death");
+            Plugin.tactsuitVr.StopAllHapticFeedback();
         }
     }
+
+    [HarmonyPatch(typeof(CharacterFootsteps), "PlayJumpAudio")]
+    public class bhaptics_OnJump
+    {
+        [HarmonyPostfix]
+        public static void Postfix(CharacterFootsteps __instance)
+        {
+            Plugin.tactsuitVr.PlaybackHaptics("OnJump");
+        }
+    }
+
+    [HarmonyPatch(typeof(CharacterFootsteps), "PlayLandAudio")]
+    public class bhaptics_OnJumpLand
+    {
+        [HarmonyPostfix]
+        public static void Postfix(CharacterFootsteps __instance)
+        {
+            Plugin.tactsuitVr.PlaybackHaptics("LandAfterJump");
+        }
+    }
+
+    [HarmonyPatch(typeof(PlayerController), "EquipWeapon")]
+    public class bhaptics_OnEquipWeapon
+    {
+        [HarmonyPostfix]
+        public static void Postfix(PlayerController __instance)
+        {
+            Plugin.tactsuitVr.PlaybackHaptics("RecoilArm_R", true, 0.5f, 1f);
+            Plugin.tactsuitVr.PlaybackHaptics("RecoilVest_R", true, 0.5f, 1f);
+        }
+    }
+
+    [HarmonyPatch(typeof(PlayerController), "UnEquipWeapon")]
+    public class bhaptics_OnUnEquipWeapon
+    {
+        [HarmonyPostfix]
+        public static void Postfix(PlayerController __instance)
+        {
+            Plugin.tactsuitVr.PlaybackHaptics("RecoilArm_R", true, 0.5f, 1f);
+            Plugin.tactsuitVr.PlaybackHaptics("RecoilVest_R", true, 0.5f, 1f);
+        }
+    }    
+
+    [HarmonyPatch(typeof(GameManager), "Heal")]
+    public class bhaptics_OnHeal
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.tactsuitVr.PlaybackHaptics("Heal");
+        }
+    }
+
+    [HarmonyPatch(typeof(HurtBordersController), "ShowBorder")]
+    public class bhaptics_OnShowBorderAndHitDamage
+    {
+        [HarmonyPostfix]
+        public static void Postfix(HurtBordersController __instance)
+        {
+            if (Traverse.Create(__instance).Field("m_HitCount").GetValue<int>() <
+                Traverse.Create(__instance).Field("m_HitMax").GetValue<int>())
+            {
+                Plugin.tactsuitVr.StartHeartBeat();
+                Plugin.tactsuitVr.PlaybackHaptics("Impact");
+                Plugin.tactsuitVr.PlaybackHaptics("ShotVisor");
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(HurtBordersController), "HideBorder")]
+    public class bhaptics_OnHideBorder
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.tactsuitVr.StopHeartBeat();
+        }
+    }
+
+    [HarmonyPatch(typeof(BaseWeapon), "Attack")]
+    public class bhaptics_OnAttackWeapon
+    {
+        [HarmonyPostfix]
+        public static void Postfix(BaseWeapon __instance)
+        {
+            if (!Traverse.Create(__instance).Field("m_CanAttack").GetValue<bool>() ||
+                !Traverse.Create(__instance).Field("m_IsEquipped").GetValue<bool>() ||
+                GameManager.Instance.Player.isLocked ||
+                GameManager.Instance.isPaused ||
+                !(!Traverse.Create(__instance).Field("m_IsHoldToAttack").GetValue<bool>() ? PlayerInput.Attack() : PlayerInput.AttackHold()))
+            {
+                return;
+            }
+            Plugin.tactsuitVr.PlaybackHaptics("RecoilArm_R");
+            Plugin.tactsuitVr.PlaybackHaptics("RecoilVest_R");
+        }
+    }
+
+    #endregion
+
+    #region JumpScare Events
+
+    #endregion
 }
 
