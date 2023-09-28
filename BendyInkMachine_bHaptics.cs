@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
+using BendyVR_5.Player.Patches;
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
@@ -140,46 +141,24 @@ namespace BendyInkMachine_bHaptics
         {
             Plugin.tactsuitVr.StopHeartBeat();
         }
-    }
-
-    [HarmonyPatch(typeof(MeleeWeapon), "DOAttack")]
-    public class bhaptics_OnMeleeWeapon
-    {
-        [HarmonyPostfix]
-        public static void Postfix(MeleeWeapon __instance)
-        {
-            Plugin.tactsuitVr.PlaybackHaptics("RecoilArm_" + Plugin.handString);
-            Plugin.tactsuitVr.PlaybackHaptics("RecoilVest_" + Plugin.handString);
-        }
-    }
-
-    [HarmonyPatch(typeof(GunWeapon), "OnAttack")]
-    public class bhaptics_OnGunWeapon
-    {
-        [HarmonyPostfix]
-        public static void Postfix(GunWeapon __instance)
-        {
-            Plugin.tactsuitVr.PlaybackHaptics("RecoilArm_" + Plugin.handString);
-            Plugin.tactsuitVr.PlaybackHaptics("RecoilVest_" + Plugin.handString);
-        }
     }    
 
-    [HarmonyPatch(typeof(GunWeapon), "ReloadOnComplete")]
+    [HarmonyPatch(typeof(HoldableItemPatches), "VRReload")]
     public class bhaptics_OnGunWeaponReloaded
     {
         [HarmonyPostfix]
-        public static void Postfix(GunWeapon __instance)
+        public static void Postfix(HoldableItemPatches __instance)
         {
             Plugin.tactsuitVr.PlaybackHaptics("RecoilArm_" + Plugin.handString, true, 0.2f, 1f);
             Plugin.tactsuitVr.PlaybackHaptics("RecoilVest_" + Plugin.handString, true, 0.2f, 1f);
         }
     }
 
-    [HarmonyPatch(typeof(ThrowWeapon), "OnAttack")]
-    public class bhaptics_OnThrowWeapon
+    [HarmonyPatch(typeof(HoldableItemPatches), "NewAttack")]
+    public class bhaptics_OnBaseWeaponAttack
     {
         [HarmonyPostfix]
-        public static void Postfix(ThrowWeapon __instance)
+        public static void Postfix(HoldableItemPatches __instance)
         {
             Plugin.tactsuitVr.PlaybackHaptics("RecoilArm_" + Plugin.handString);
             Plugin.tactsuitVr.PlaybackHaptics("RecoilVest_" + Plugin.handString);
@@ -198,11 +177,20 @@ namespace BendyInkMachine_bHaptics
         [HarmonyPostfix]
         public static void Postfix()
         {
-            Plugin.tactsuitVr.PlaybackHaptics("JumpScareLight_Vest");
+            Plugin.tactsuitVr.PlayHapticsWithDelay("JumpScareLight_Vest", 400);
         }
     }
     [HarmonyPatch(typeof(CH1JumpScareController), "HandleJumpScareTriggerOnEnter")]
     public class bhaptics_OnHandleJumpScareTriggerOnEnter
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.tactsuitVr.PlaybackHaptics("JumpScareLight_Vest");
+        }
+    }    
+    [HarmonyPatch(typeof(CH1JumpScareController), "HandleBendyDoorOnInteract")]
+    public class bhaptics_OnHandleBendyDoorOnInteract
     {
         [HarmonyPostfix]
         public static void Postfix()

@@ -6,6 +6,7 @@ using System.Threading;
 using Bhaptics.Tact;
 using BendyInkMachine_bHaptics;
 using UnityEngine;
+using System.Threading.Tasks;
 
 namespace MyBhapticsTactsuit
 {
@@ -90,6 +91,14 @@ namespace MyBhapticsTactsuit
                 FeedbackMap.Add(prefix, Files[i]);
             }
             systemInitialized = true;
+        }
+
+        public void PlayHapticsWithDelay(String key, int delay)
+        {
+            Task.Run(async () => {
+                await Task.Delay(delay);
+                PlaybackHaptics(key);
+            });
         }
 
         public void PlaybackHaptics(String key, bool forced = true, float intensity = 1.0f, float duration = 1.0f)
