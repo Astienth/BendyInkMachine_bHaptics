@@ -189,6 +189,15 @@ namespace BendyInkMachine_bHaptics
             Plugin.tactsuitVr.PlaybackHaptics("JumpScareLight_Vest");
         }
     }    
+    [HarmonyPatch(typeof(CH1JumpScareController), "DOBendyDoor")]
+    public class bhaptics_OnDOBendyDoor
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.tactsuitVr.PlaybackHaptics("JumpScareLight_Vest");
+        }
+    }
     [HarmonyPatch(typeof(CH1JumpScareController), "HandleBendyDoorOnInteract")]
     public class bhaptics_OnHandleBendyDoorOnInteract
     {
