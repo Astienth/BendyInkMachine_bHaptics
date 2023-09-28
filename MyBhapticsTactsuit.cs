@@ -17,6 +17,7 @@ namespace MyBhapticsTactsuit
         public bool systemInitialized = false;
         // Event to start and stop the heartbeat thread
         private static ManualResetEvent HeartBeat_mrse = new ManualResetEvent(false);
+        private static ManualResetEvent Rumble_mrse = new ManualResetEvent(false);
         // dictionary of all feedback patterns found in the bHaptics directory
         public Dictionary<String, FileInfo> FeedbackMap = new Dictionary<String, FileInfo>();
 
@@ -38,6 +39,19 @@ namespace MyBhapticsTactsuit
                 Thread.Sleep(1000);
             }
         }
+        public void RumbleFunc()
+        {
+            while (true)
+            {
+                // Check if reset event is active
+                Rumble_mrse.WaitOne();
+                PlaybackHaptics("Rumble_Head");
+                PlaybackHaptics("Rumble_Left_Arms");
+                PlaybackHaptics("Rumble_Right_Arms");
+                PlaybackHaptics("Rumble_Vest");
+                Thread.Sleep(1000);
+            }
+        }
 
         public TactsuitVR()
         {
@@ -55,6 +69,8 @@ namespace MyBhapticsTactsuit
             LOG("Starting HeartBeat thread...");
             Thread HeartBeatThread = new Thread(HeartBeatFunc);
             HeartBeatThread.Start();
+            Thread RumbleThread = new Thread(RumbleFunc);
+            RumbleThread.Start();
         }
 
         public void LOG(string logStr)
@@ -95,10 +111,7 @@ namespace MyBhapticsTactsuit
 
         public void PlayHapticsWithDelay(String key, int delay)
         {
-            Task.Run(async () => {
-                await Task.Delay(delay);
-                PlaybackHaptics(key);
-            });
+            Task.Delay(delay).ContinueWith((t) => { PlaybackHaptics(key); });
         }
 
         public void PlaybackHaptics(String key, bool forced = true, float intensity = 1.0f, float duration = 1.0f)
@@ -122,61 +135,6 @@ namespace MyBhapticsTactsuit
             }
         }
 
-        public void PlayBackHit(String key, float xzAngle, float yShift)
-        {
-            // two parameters can be given to the pattern to move it on the vest:
-            // 1. An angle in degrees [0, 360] to turn the pattern to the left
-            // 2. A shift [-0.5, 0.5] in y-direction (up and down) to move it up or down
-            if (suitDisabled) { return; }
-            ScaleOption scaleOption = new ScaleOption(1f, 1f);
-            RotationOption rotationOption = new RotationOption(xzAngle, yShift);
-            hapticPlayer.SubmitRegisteredVestRotation(key, key, rotationOption, scaleOption);
-        }
-
-        public static KeyValuePair<float, float> getAngleAndShift(Transform player, Vector3 hit, float fixRotation = 0f)
-        {
-            // bhaptics pattern starts in the front, then rotates to the left. 0° is front, 90° is left, 270° is right.
-            // y is "up", z is "forward" in local coordinates
-            Vector3 patternOrigin = new Vector3(0f, 0f, 1f);
-            Vector3 hitPosition = hit - player.position;
-            Quaternion myPlayerRotation = player.rotation;
-            //rotation fix if needed
-            myPlayerRotation *= Quaternion.Euler(0, fixRotation, 0);
-            Vector3 playerDir = myPlayerRotation.eulerAngles;
-            // get rid of the up/down component to analyze xz-rotation
-            Vector3 flattenedHit = new Vector3(hitPosition.x, 0f, hitPosition.z);
-
-            // get angle. .Net < 4.0 does not have a "SignedAngle" function...
-            float hitAngle = Vector3.Angle(flattenedHit, patternOrigin);
-            // check if cross product points up or down, to make signed angle myself
-            Vector3 crossProduct = Vector3.Cross(flattenedHit, patternOrigin);
-            if (crossProduct.y < 0f) { hitAngle *= -1f; }
-            // relative to player direction
-            float myRotation = hitAngle - playerDir.y;
-            // switch directions (bhaptics angles are in mathematically negative direction)
-            myRotation *= -1f;
-            //fix rotation
-            myRotation += -1f * fixRotation;
-            // convert signed angle into [0, 360] rotation
-            if (myRotation < 0f) { myRotation = 360f + myRotation; }
-
-
-            // up/down shift is in y-direction
-            // in Battle Sister, the torso Transform has y=0 at the neck,
-            // and the torso ends at roughly -0.5 (that's in meters)
-            // so cap the shift to [-0.5, 0]...
-            float hitShift = hitPosition.y;
-            float upperBound = -4.5f;
-            float lowerBound = -5.5f;
-            if (hitShift > upperBound) { hitShift = 0.5f; }
-            else if (hitShift < lowerBound) { hitShift = -0.5f; }
-            // ...and then spread/shift it to [-0.5, 0.5], which is how bhaptics expects it
-            else { hitShift = (hitShift - lowerBound) / (upperBound - lowerBound) - 0.5f; }
-
-            // No tuple returns available in .NET < 4.0, so this is the easiest quickfix
-            return new KeyValuePair<float, float>(myRotation, hitShift);
-        }
-
         public void StartHeartBeat(string effect)
         {
             heartBeatEffect = effect;
@@ -186,6 +144,16 @@ namespace MyBhapticsTactsuit
         public void StopHeartBeat()
         {
             HeartBeat_mrse.Reset();
+        }
+
+        public void StartRumble()
+        {
+            Rumble_mrse.Set();
+        }
+
+        public void StopRumble()
+        {
+            Rumble_mrse.Reset();
         }
 
         public void StopHapticFeedback(String effect)
@@ -205,6 +173,7 @@ namespace MyBhapticsTactsuit
         public void StopThreads()
         {
             StopHeartBeat();
+            StopRumble();
         }
 
 

@@ -142,7 +142,7 @@ namespace BendyInkMachine_bHaptics
             Plugin.tactsuitVr.StopHeartBeat();
         }
     }    
-
+    
     [HarmonyPatch(typeof(HoldableItemPatches), "VRReload")]
     public class bhaptics_OnGunWeaponReloaded
     {
@@ -153,9 +153,9 @@ namespace BendyInkMachine_bHaptics
             Plugin.tactsuitVr.PlaybackHaptics("RecoilVest_" + Plugin.handString, true, 0.2f, 1f);
         }
     }
-
-    [HarmonyPatch(typeof(HoldableItemPatches), "NewAttack")]
-    public class bhaptics_OnBaseWeaponAttack
+    
+    [HarmonyPatch(typeof(HoldableItemPatches), "GunAttack")]
+    public class bhaptics_OnGunAttack
     {
         [HarmonyPostfix]
         public static void Postfix(HoldableItemPatches __instance)
@@ -165,19 +165,58 @@ namespace BendyInkMachine_bHaptics
         }
     }
 
+    [HarmonyPatch(typeof(HoldableItemPatches), "RevisedMeleeAttack")]
+    public class bhaptics_OnRevisedMeleeAttack
+    {
+        [HarmonyPostfix]
+        public static void Postfix(HoldableItemPatches __instance)
+        {
+            Plugin.tactsuitVr.PlaybackHaptics("RecoilArm_" + Plugin.handString);
+            Plugin.tactsuitVr.PlaybackHaptics("RecoilVest_" + Plugin.handString);
+        }
+    }
+
+    [HarmonyPatch(typeof(ThrowWeapon), "OnAttack")]
+    public class bhaptics_OnThrowWeapon
+    {
+        [HarmonyPostfix]
+        public static void Postfix(ThrowWeapon __instance)
+        {
+            Plugin.tactsuitVr.PlaybackHaptics("RecoilArm_" + Plugin.handString);
+            Plugin.tactsuitVr.PlaybackHaptics("RecoilVest_" + Plugin.handString);
+        }
+    }
+
     #endregion
 
-    #region JumpScare Events
+    #region CH1 JUMP SCARES
 
-    // CH1 JUMP SCARES
-
+    [HarmonyPatch(typeof(CH1InkMachineRevealController), "HandleLeverOnComplete")]
+    public class bhaptics_OnHandleLeverOnComplete
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.tactsuitVr.StartRumble();
+        }
+    }
+    [HarmonyPatch(typeof(CH1InkMachineRevealController), "OnMachineRevealComplete")]
+    public class bhaptics_OnOnMachineRevealComplete
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.tactsuitVr.StopRumble();
+        }
+    }
     [HarmonyPatch(typeof(CH1JumpScareController), "DOPlankScare")]
     public class bhaptics_OnPlanckJumpScare
     {
         [HarmonyPostfix]
         public static void Postfix()
         {
-            Plugin.tactsuitVr.PlayHapticsWithDelay("JumpScareLight_Vest", 400);
+            //Plugin.tactsuitVr.PlayHapticsWithDelay("JumpScareLight_Vest", 400);
+            Plugin.tactsuitVr.PlaybackHaptics("JumpScareLight_Vest");
         }
     }
     [HarmonyPatch(typeof(CH1JumpScareController), "HandleJumpScareTriggerOnEnter")]
@@ -197,7 +236,16 @@ namespace BendyInkMachine_bHaptics
         {
             Plugin.tactsuitVr.PlaybackHaptics("JumpScareLight_Vest");
         }
-    }
+    }    
+    [HarmonyPatch(typeof(CH1TheatreController), "HandleTheatreEnterOnEnter")]
+    public class bhaptics_OnHandleTheatreEnterOnEnter
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.tactsuitVr.PlaybackHaptics("JumpScareLight_Vest");
+        }
+    }    
     [HarmonyPatch(typeof(CH1JumpScareController), "HandleBendyDoorOnInteract")]
     public class bhaptics_OnHandleBendyDoorOnInteract
     {
@@ -245,8 +293,29 @@ namespace BendyInkMachine_bHaptics
             Plugin.tactsuitVr.StopHeartBeat();
         }
     }
+    [HarmonyPatch(typeof(CH1ClosingSequenceController), "HandleFinaleEventTriggerOnEnter")]
+    public class bhaptics_OnHandleFinaleEventTriggerOnEnter
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.tactsuitVr.PlaybackHaptics("JumpScare_Vest");
+            Plugin.tactsuitVr.StartHeartBeat("HeartBeatFast");
+        }
+    }
+    [HarmonyPatch(typeof(CH1ClosingSequenceController), "SequenceOnComplete")]
+    public class bhaptics_OnSequenceOnComplete
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.tactsuitVr.StopHeartBeat();
+        }
+    }
 
-    
+    #endregion
+
+    #region JumpScares CH2
 
     #endregion
 }
