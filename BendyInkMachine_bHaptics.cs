@@ -44,6 +44,19 @@ namespace BendyInkMachine_bHaptics
                 handSet = true;
             }
         }
+
+        public static void PlayJumpScareLight()
+        {
+            tactsuitVr.PlaybackHaptics("JumpScareLight_Vest");
+            tactsuitVr.PlaybackHaptics("JumpScare_Left_Arms", true, 0.4f);
+            tactsuitVr.PlaybackHaptics("JumpScare_Right_Arms", true, 0.4f);
+        }
+        public static void PlayJumpScareStrong()
+        {
+            tactsuitVr.PlaybackHaptics("JumpScare_Vest");
+            tactsuitVr.PlaybackHaptics("JumpScare_Left_Arms");
+            tactsuitVr.PlaybackHaptics("JumpScare_Right_Arms");
+        }
     }
 
     #region Player Physical Events
@@ -126,7 +139,7 @@ namespace BendyInkMachine_bHaptics
             if (Traverse.Create(__instance).Field("m_HitCount").GetValue<int>() <
                 Traverse.Create(__instance).Field("m_HitMax").GetValue<int>())
             {
-                Plugin.tactsuitVr.StartHeartBeat("HeartBeat");
+                Plugin.tactsuitVr.StartHeartBeat();
                 Plugin.tactsuitVr.PlaybackHaptics("Impact");
                 Plugin.tactsuitVr.PlaybackHaptics("ShotVisor");
             }
@@ -197,7 +210,7 @@ namespace BendyInkMachine_bHaptics
         [HarmonyPostfix]
         public static void Postfix()
         {
-            Plugin.tactsuitVr.StartRumble();
+            Plugin.tactsuitVr.StartRumble(0.2f);
         }
     }
     [HarmonyPatch(typeof(CH1InkMachineRevealController), "OnMachineRevealComplete")]
@@ -216,7 +229,6 @@ namespace BendyInkMachine_bHaptics
         public static void Postfix()
         {
             Plugin.tactsuitVr.PlayHapticsWithDelay("JumpScareLight_Vest", 400);
-            //Plugin.tactsuitVr.PlaybackHaptics("JumpScareLight_Vest");
         }
     }
     [HarmonyPatch(typeof(CH1JumpScareController), "HandleJumpScareTriggerOnEnter")]
@@ -225,7 +237,7 @@ namespace BendyInkMachine_bHaptics
         [HarmonyPostfix]
         public static void Postfix()
         {
-            Plugin.tactsuitVr.PlaybackHaptics("JumpScareLight_Vest");
+            Plugin.PlayJumpScareLight();
         }
     }    
     [HarmonyPatch(typeof(CH1JumpScareController), "DOBendyDoor")]
@@ -234,7 +246,7 @@ namespace BendyInkMachine_bHaptics
         [HarmonyPostfix]
         public static void Postfix()
         {
-            Plugin.tactsuitVr.PlaybackHaptics("JumpScareLight_Vest");
+            Plugin.PlayJumpScareLight();
         }
     }    
     [HarmonyPatch(typeof(CH1TheatreController), "HandleTheatreEnterOnEnter")]
@@ -243,7 +255,7 @@ namespace BendyInkMachine_bHaptics
         [HarmonyPostfix]
         public static void Postfix()
         {
-            Plugin.tactsuitVr.PlaybackHaptics("JumpScareLight_Vest");
+            Plugin.PlayJumpScareLight();
         }
     }    
     [HarmonyPatch(typeof(CH1JumpScareController), "HandleBendyDoorOnInteract")]
@@ -252,7 +264,7 @@ namespace BendyInkMachine_bHaptics
         [HarmonyPostfix]
         public static void Postfix()
         {
-            Plugin.tactsuitVr.PlaybackHaptics("JumpScareLight_Vest");
+            Plugin.PlayJumpScareLight();
         }
     }
     [HarmonyPatch(typeof(CH1BendyFinaleController), "ActualActivate")]
@@ -261,9 +273,9 @@ namespace BendyInkMachine_bHaptics
         [HarmonyPostfix]
         public static void Postfix()
         {
-            Plugin.tactsuitVr.PlaybackHaptics("JumpScare_Vest");
+            Plugin.PlayJumpScareStrong();
             Plugin.tactsuitVr.PlaybackHaptics("HeartBeatFast");
-            Plugin.tactsuitVr.StartHeartBeat("HeartBeatFast");
+            Plugin.tactsuitVr.StartHeartBeat(true);
         }
     }
     [HarmonyPatch(typeof(CH1BendyFinaleController), "ShakeCamera")]
@@ -272,7 +284,7 @@ namespace BendyInkMachine_bHaptics
         [HarmonyPostfix]
         public static void Postfix()
         {
-            Plugin.tactsuitVr.PlaybackHaptics("JumpScareLight_Vest");
+            Plugin.PlayJumpScareLight();
         }
     }
     [HarmonyPatch(typeof(CH1BendyFinaleController), "BreakFloor")]
@@ -281,7 +293,7 @@ namespace BendyInkMachine_bHaptics
         [HarmonyPostfix]
         public static void Postfix()
         {
-            Plugin.tactsuitVr.PlaybackHaptics("JumpScare_Vest");
+            Plugin.PlayJumpScareStrong();
         }
     }
     [HarmonyPatch(typeof(CH1BendyFinaleController), "HandleExitEventTriggerOnEnter")]
@@ -299,8 +311,8 @@ namespace BendyInkMachine_bHaptics
         [HarmonyPostfix]
         public static void Postfix()
         {
-            Plugin.tactsuitVr.PlaybackHaptics("JumpScare_Vest");
-            Plugin.tactsuitVr.StartHeartBeat("HeartBeatFast");
+            Plugin.PlayJumpScareStrong();
+            Plugin.tactsuitVr.StartHeartBeat(true);
         }
     }
     [HarmonyPatch(typeof(CH1ClosingSequenceController), "SequenceOnComplete")]
@@ -315,8 +327,120 @@ namespace BendyInkMachine_bHaptics
 
     #endregion
 
-    #region JumpScares CH2
+    #region CH2 JUMP SCARES
 
+    [HarmonyPatch(typeof(CH2RitualRoomController), "HandleScareTriggerOnEnter")]
+    public class bhaptics_OnHandleScareTriggerOnEnter
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.PlayJumpScareLight();
+        }
+    }
+    
+    [HarmonyPatch(typeof(CH2MusicDepartmentController), "HandleInitialSearcherOnActivate")]
+    public class bhaptics_OnHandleInitialSearcherOnActivate
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.PlayJumpScareLight();
+        }
+    }
+    
+    [HarmonyPatch(typeof(CH2SanctuaryController), "HandleJumpscareTriggerOnEnter")]
+    public class bhaptics_OnHandleJumpscareTriggerOnEnter
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.PlayJumpScareLight();
+        }
+    }
+    
+    [HarmonyPatch(typeof(CH2SearcherBattleController), "HandleFinaleTriggerOnEnter")]
+    public class bhaptics_OnHandleFinaleTriggerOnEnter
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.PlayJumpScareLight();
+        }
+    }
+    
+    [HarmonyPatch(typeof(CH2SammyOfficeController), "HandleKnockoutEventTriggerOnEnter")]
+    public class bhaptics_OnHandleKnockoutEventTriggerOnEnter
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.PlayJumpScareLight();
+            Plugin.tactsuitVr.PlaybackHaptics("ShotVisor", true, 2f);
+            Plugin.tactsuitVr.StartHeartBeat();
+        }
+    }
+    
+    [HarmonyPatch(typeof(CH2SammyOfficeController), "OnDisposed")]
+    public class bhaptics_OnDisposed
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.tactsuitVr.StopAllHapticFeedback();
+        }
+    }
+        
+    [HarmonyPatch(typeof(CH2SacrificeController), "HandleSpeakersOnComplete")]
+    public class bhaptics_OnHandleSpeakersOnComplete
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.tactsuitVr.StartHeartBeat();
+        }
+    }
+    
+    [HarmonyPatch(typeof(CH2SacrificeController), "HandleSpeakerMonologueOnComplete")]
+    public class bhaptics_OnHandleSpeakerMonologueOnComplete
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.tactsuitVr.StopHeartBeat();
+        }
+    }
+    
+    [HarmonyPatch(typeof(CH2BendyChaseController), "BendyReveal")]
+    public class bhaptics_OnBendyReveal
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.PlayJumpScareStrong();
+            Plugin.tactsuitVr.StartHeartBeat(true);
+        }
+    }
+    
+    [HarmonyPatch(typeof(CH2BendyChaseController), "HandleDoorCloseOnComplete")]
+    public class bhaptics_OnHandleDoorCloseOnComplete
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.tactsuitVr.StopHeartBeat();
+        }
+    }
+
+    [HarmonyPatch(typeof(CH2RecordingStudioController), "HandlePianoJumpscareOnEnter")]
+    public class bhaptics_OnHandlePianoJumpscareOnEnter
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.PlayJumpScareLight();
+        }
+    }
     #endregion
 }
 

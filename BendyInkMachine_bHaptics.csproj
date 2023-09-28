@@ -33,18 +33,23 @@
   <ItemGroup>
     <Reference Include="0Harmony">
       <HintPath>..\..\..\..\GAMES\Bendy and the Ink Machine\BepInEx\core\0Harmony.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>..\..\..\..\GAMES\Bendy and the Ink Machine\Bendy and the Ink Machine_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="BendyVR_5">
       <HintPath>..\..\..\..\GAMES\Bendy and the Ink Machine\BepInEx\plugins\BendyVR_5.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="BepInEx">
       <HintPath>..\..\..\..\GAMES\Bendy and the Ink Machine\BepInEx\core\BepInEx.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Bhaptics.Tact">
       <HintPath>..\..\..\..\GAMES\Bendy and the Ink Machine\BepInEx\plugins\Bhaptics.Tact.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -56,13 +61,16 @@
     <Reference Include="System.Xml" />
     <Reference Include="UnityEngine">
       <HintPath>..\..\..\..\GAMES\Bendy and the Ink Machine\Bendy and the Ink Machine_Data\Managed\UnityEngine.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\..\..\..\GAMES\Bendy and the Ink Machine\Bendy and the Ink Machine_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.PhysicsModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\GAMES\Bendy and the Ink Machine\Bendy and the Ink Machine_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>

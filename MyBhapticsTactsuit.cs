@@ -28,6 +28,7 @@ namespace MyBhapticsTactsuit
         private static RotationOption defaultRotationOption = new RotationOption(0.0f, 0.0f);
 
         public string heartBeatEffect = "HeartBeat";
+        public float rumbleIntensity = 1.0f;
 
         public void HeartBeatFunc()
         {
@@ -45,10 +46,10 @@ namespace MyBhapticsTactsuit
             {
                 // Check if reset event is active
                 Rumble_mrse.WaitOne();
-                PlaybackHaptics("Rumble_Head");
-                PlaybackHaptics("Rumble_Left_Arms");
-                PlaybackHaptics("Rumble_Right_Arms");
-                PlaybackHaptics("Rumble_Vest", true, 0.4f);
+                PlaybackHaptics("Rumble_Head", true, rumbleIntensity);
+                PlaybackHaptics("Rumble_Left_Arms", true, rumbleIntensity);
+                PlaybackHaptics("Rumble_Right_Arms", true, rumbleIntensity);
+                PlaybackHaptics("Rumble_Vest", true, rumbleIntensity);
                 Thread.Sleep(1000);
             }
         }
@@ -140,9 +141,9 @@ namespace MyBhapticsTactsuit
             }
         }
 
-        public void StartHeartBeat(string effect)
+        public void StartHeartBeat(bool fast = false)
         {
-            heartBeatEffect = effect;
+            heartBeatEffect = (fast) ? "HeartBeatFast" : "HeartBeat";
             HeartBeat_mrse.Set();
         }
 
@@ -151,8 +152,9 @@ namespace MyBhapticsTactsuit
             HeartBeat_mrse.Reset();
         }
 
-        public void StartRumble()
+        public void StartRumble(float intensity)
         {
+            rumbleIntensity = intensity;
             Rumble_mrse.Set();
         }
 
