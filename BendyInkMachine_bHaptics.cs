@@ -215,8 +215,8 @@ namespace BendyInkMachine_bHaptics
         [HarmonyPostfix]
         public static void Postfix()
         {
-            //Plugin.tactsuitVr.PlayHapticsWithDelay("JumpScareLight_Vest", 400);
-            Plugin.tactsuitVr.PlaybackHaptics("JumpScareLight_Vest");
+            Plugin.tactsuitVr.PlayHapticsWithDelay("JumpScareLight_Vest", 400);
+            //Plugin.tactsuitVr.PlaybackHaptics("JumpScareLight_Vest");
         }
     }
     [HarmonyPatch(typeof(CH1JumpScareController), "HandleJumpScareTriggerOnEnter")]

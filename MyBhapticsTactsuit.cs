@@ -48,7 +48,7 @@ namespace MyBhapticsTactsuit
                 PlaybackHaptics("Rumble_Head");
                 PlaybackHaptics("Rumble_Left_Arms");
                 PlaybackHaptics("Rumble_Right_Arms");
-                PlaybackHaptics("Rumble_Vest");
+                PlaybackHaptics("Rumble_Vest", true, 0.4f);
                 Thread.Sleep(1000);
             }
         }
@@ -111,7 +111,12 @@ namespace MyBhapticsTactsuit
 
         public void PlayHapticsWithDelay(String key, int delay)
         {
-            Task.Delay(delay).ContinueWith((t) => { PlaybackHaptics(key); });
+            Thread thread = new Thread(() =>
+            {
+                Thread.Sleep(delay);
+                PlaybackHaptics(key);
+            });
+            thread.Start();
         }
 
         public void PlaybackHaptics(String key, bool forced = true, float intensity = 1.0f, float duration = 1.0f)
