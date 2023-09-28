@@ -25,13 +25,15 @@ namespace MyBhapticsTactsuit
 
         private static RotationOption defaultRotationOption = new RotationOption(0.0f, 0.0f);
 
+        public string heartBeatEffect = "HeartBeat";
+
         public void HeartBeatFunc()
         {
             while (true)
             {
                 // Check if reset event is active
                 HeartBeat_mrse.WaitOne();
-                PlaybackHaptics("HeartBeat");
+                PlaybackHaptics(heartBeatEffect);
                 Thread.Sleep(1000);
             }
         }
@@ -166,8 +168,9 @@ namespace MyBhapticsTactsuit
             return new KeyValuePair<float, float>(myRotation, hitShift);
         }
 
-        public void StartHeartBeat()
+        public void StartHeartBeat(string effect)
         {
+            heartBeatEffect = effect;
             HeartBeat_mrse.Set();
         }
 
