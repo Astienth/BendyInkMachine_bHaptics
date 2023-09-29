@@ -50,12 +50,14 @@ namespace BendyInkMachine_bHaptics
             tactsuitVr.PlaybackHaptics("JumpScareLight_Vest");
             tactsuitVr.PlaybackHaptics("JumpScare_Left_Arms", true, 0.4f);
             tactsuitVr.PlaybackHaptics("JumpScare_Right_Arms", true, 0.4f);
+            tactsuitVr.PlaybackHaptics("ShotVisor", true, 0.4f);
         }
         public static void PlayJumpScareStrong()
         {
             tactsuitVr.PlaybackHaptics("JumpScare_Vest");
             tactsuitVr.PlaybackHaptics("JumpScare_Left_Arms");
             tactsuitVr.PlaybackHaptics("JumpScare_Right_Arms");
+            tactsuitVr.PlaybackHaptics("ShotVisor");
         }
     }
 
@@ -434,6 +436,16 @@ namespace BendyInkMachine_bHaptics
 
     [HarmonyPatch(typeof(CH2RecordingStudioController), "HandlePianoJumpscareOnEnter")]
     public class bhaptics_OnHandlePianoJumpscareOnEnter
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.PlayJumpScareLight();
+        }
+    }
+    
+    [HarmonyPatch(typeof(CH2ClosingSequenceController), "HandleFinalTriggerOnEnter")]
+    public class bhaptics_OnHandleFinalTriggerOnEnter
     {
         [HarmonyPostfix]
         public static void Postfix()
