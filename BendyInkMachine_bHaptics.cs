@@ -58,6 +58,7 @@ namespace BendyInkMachine_bHaptics
             tactsuitVr.PlaybackHaptics("JumpScare_Left_Arms");
             tactsuitVr.PlaybackHaptics("JumpScare_Right_Arms");
             tactsuitVr.PlaybackHaptics("ShotVisor");
+            tactsuitVr.PlayHapticsWithDelay("HeartBeatFast", 400);
         }
     }
 
@@ -453,6 +454,20 @@ namespace BendyInkMachine_bHaptics
             Plugin.PlayJumpScareLight();
         }
     }
+    #endregion
+
+    #region CH3 JUMP SCARES
+
+    [HarmonyPatch(typeof(CH3AliceRevealController), "HandleAliceIntroMusicOnComplete")]
+    public class bhaptics_OnHandleAliceIntroMusicOnComplete
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.PlayJumpScareStrong();
+        }
+    }
+
     #endregion
 }
 
