@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using BendyVR_5.Player.Patches;
 using BepInEx;
 using BepInEx.Logging;
+using DG.Tweening;
 using HarmonyLib;
 using MyBhapticsTactsuit;
 using TMG.Controls;
@@ -59,6 +61,40 @@ namespace BendyInkMachine_bHaptics
             tactsuitVr.PlaybackHaptics("JumpScare_Right_Arms");
             tactsuitVr.PlaybackHaptics("ShotVisor");
             tactsuitVr.PlayHapticsWithDelay("HeartBeatFast", 400);
+            tactsuitVr.PlayHapticsWithDelay("HeartBeatFast", 1400);
+        }
+
+        public static void RumbleOnce(float rumbleIntensity = 1.0f, bool withDelay = false, int delay = 0)
+        {
+            if(withDelay)
+            {
+                Thread thread = new Thread(() =>
+                {
+                    Thread.Sleep(delay);
+                    tactsuitVr.PlaybackHaptics("Rumble_Head", true, rumbleIntensity);
+                    tactsuitVr.PlaybackHaptics("Rumble_Left_Arms", true, rumbleIntensity);
+                    tactsuitVr.PlaybackHaptics("Rumble_Right_Arms", true, rumbleIntensity);
+                    tactsuitVr.PlaybackHaptics("Rumble_Vest", true, rumbleIntensity);
+                });
+                thread.Start();
+            }
+            else
+            {
+                tactsuitVr.PlaybackHaptics("Rumble_Head", true, rumbleIntensity);
+                tactsuitVr.PlaybackHaptics("Rumble_Left_Arms", true, rumbleIntensity);
+                tactsuitVr.PlaybackHaptics("Rumble_Right_Arms", true, rumbleIntensity);
+                tactsuitVr.PlaybackHaptics("Rumble_Vest", true, rumbleIntensity);
+            }
+        }
+
+        public static void RunFunctionWithDelay(Action callback, int delay)
+        {
+            Thread thread = new Thread(() =>
+            {
+                Thread.Sleep(delay);
+                callback();
+            });
+            thread.Start();
         }
     }
 
@@ -74,6 +110,29 @@ namespace BendyInkMachine_bHaptics
             Plugin.tactsuitVr.StopAllHapticFeedback();
         }
     }
+    
+    [HarmonyPatch(typeof(PlayerController), "PlayRespawnEffects")]
+    public class bhaptics_OnPlayRespawnEffects
+    {
+        [HarmonyPostfix]
+        public static void Postfix(PlayerController __instance)
+        {
+            Plugin.tactsuitVr.StopAllHapticFeedback();
+        }
+    }
+
+    [HarmonyPatch(typeof(VisionEffectController), "BeginEffect")]
+    public class bhaptics_OnBeginEffect
+    {
+        [HarmonyPostfix]
+        public static void Postfix(VisionEffectController __instance, bool isDeath)
+        {
+            if (isDeath)
+            {
+                Plugin.tactsuitVr.StopAllHapticFeedback();
+            }
+        }
+    }    
 
     [HarmonyPatch(typeof(CharacterFootsteps), "PlayJumpAudio")]
     public class bhaptics_OnJump
@@ -130,6 +189,7 @@ namespace BendyInkMachine_bHaptics
         public static void Postfix()
         {
             Plugin.tactsuitVr.PlaybackHaptics("Heal");
+            Plugin.tactsuitVr.StopAllHapticFeedback();
         }
     }
 
@@ -465,6 +525,197 @@ namespace BendyInkMachine_bHaptics
         public static void Postfix()
         {
             Plugin.PlayJumpScareStrong();
+        }
+    }
+
+    [HarmonyPatch(typeof(CH3BorisJumpscareController), "HandleJumpscareTriggerOnEnter")]
+    public class bhaptics_OnHandleJumpscareTriggerOnEnterBoris
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.PlayJumpScareLight();
+        }
+    }
+    
+    [HarmonyPatch(typeof(CH3LiftEntranceController), "HandlePiperTriggerOnEnter")]
+    public class bhaptics_OnHandlePiperTriggerOnEnter
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.PlayJumpScareStrong();
+        }
+    }
+    
+    [HarmonyPatch(typeof(CH3DarkHallwayController), "HandleDuctCrawlingTriggerOnEnter")]
+    public class bhaptics_OnHandleDuctCrawlingTriggerOnEnter
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.RunFunctionWithDelay(Plugin.PlayJumpScareLight, 200);
+        }
+    }
+    
+    [HarmonyPatch(typeof(CH3AliceLairController), "ClearLair")]
+    public class bhaptics_OnClearLair
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.RumbleOnce(1.0f);
+            Plugin.RumbleOnce(1.0f, true, 200);
+        }
+    }
+    
+    [HarmonyPatch(typeof(CH3InkPressurePuzzle), "HandleCollectableOnInteracted")]
+    public class bhaptics_OnHandleCollectableOnInteracted
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.tactsuitVr.PlaybackHaptics("Rumble_Left_Arms");
+            Plugin.tactsuitVr.PlayHapticsWithDelay("RecoilVest_L", 100);
+        }
+    }
+
+    [HarmonyPatch(typeof(CH3BendyController), "HandleBendyOnSpotted")]
+    public class bhaptics_OnHandleBendyOnSpotted
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.PlayJumpScareLight();
+            Plugin.tactsuitVr.StartHeartBeat(true);
+        }
+    }
+
+    [HarmonyPatch(typeof(CH3BendyController), "StopChaseMusic")]
+    public class bhaptics_OnStopChaseMusic
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.tactsuitVr.StopHeartBeat();
+            Plugin.tactsuitVr.PlaybackHaptics("HeartBeat");
+            Plugin.tactsuitVr.PlayHapticsWithDelay("HeartBeat", 1000);
+        }
+    }
+
+    [HarmonyPatch(typeof(CH3ProjectionistTaskController), "HandleFirstHeartOnInteracted")]
+    public class bhaptics_OnHandleFirstHeartOnInteracted
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.PlayJumpScareStrong();
+        }
+    }
+
+    [HarmonyPatch(typeof(CH3ProjectionistTaskController), "HandlePlayerOnSpotted")]
+    public class bhaptics_OnHandlePlayerOnSpotted
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.PlayJumpScareLight();
+            Plugin.tactsuitVr.StartHeartBeat(true);
+        }
+    }
+    
+    [HarmonyPatch(typeof(CH3ProjectionistTaskController), "HandleProjectionistOnRetreat")]
+    public class bhaptics_OnHandleProjectionistOnRetreat
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.tactsuitVr.StopHeartBeat();
+            Plugin.tactsuitVr.PlaybackHaptics("HeartBeat");
+            Plugin.tactsuitVr.PlayHapticsWithDelay("HeartBeat", 1000);
+        }
+    }
+
+
+    // LIFT MOVEMENTS RUMBLES
+
+    [HarmonyPatch(typeof(CH3LiftController), "DOLiftMove")]
+    public class bhaptics_OnDOLiftMove
+    {
+        [HarmonyPostfix]
+        public static void Postfix(CH3LiftController __instance)
+        {
+            if(!__instance.IsInCart)
+            {
+                return;
+            }
+            Plugin.tactsuitVr.StartRumble(0.2f);
+        }
+    }
+
+    [HarmonyPatch(typeof(CH3LiftController), "HandleMoveOnComplete")]
+    public class bhaptics_OnHandleMoveOnComplete
+    {
+        [HarmonyPostfix]
+        public static void Postfix(CH3LiftController __instance)
+        {
+            if (!__instance.IsInCart)
+            {
+                return;
+            }
+
+            Plugin.tactsuitVr.StopRumble();
+        }
+    }
+        
+    [HarmonyPatch(typeof(CH3ClosingSequenceController), "DOLiftDrop")]
+    public class bhaptics_OnDOLiftDrop
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.tactsuitVr.StopRumble();
+            Plugin.tactsuitVr.StartRumble(1.5f);
+        }
+    }
+
+    [HarmonyPatch(typeof(CH3ClosingSequenceController), "DOLiftAscend")]
+    public class bhaptics_OnDOLiftAscend
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.tactsuitVr.StartRumble(0.2f);
+        }
+    }
+    
+    [HarmonyPatch(typeof(CH3ClosingSequenceController), "LiftDropOnComplete")]
+    public class bhaptics_OnLiftDropOnComplete
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.tactsuitVr.StopRumble();
+        }
+    }
+    
+    [HarmonyPatch(typeof(CH3ClosingSequenceController), "HandleAliceOnWaypointComplete")]
+    public class bhaptics_OnHandleAliceOnWaypointComplete
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.PlayJumpScareLight();
+        }
+    }
+    
+    [HarmonyPatch(typeof(CH3ClosingSequenceController), "DOBorisPull")]
+    public class bhaptics_OnDOBorisPull
+    {
+        [HarmonyPostfix]
+        public static void Postfix(Sequence __result)
+        {
+            __result.OnStart(() => { Plugin.PlayJumpScareStrong(); });            
         }
     }
 
