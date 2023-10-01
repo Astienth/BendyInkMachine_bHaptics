@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 using BendyVR_5.Player.Patches;
 using BepInEx;
 using BepInEx.Logging;
@@ -20,6 +21,7 @@ namespace BendyInkMachine_bHaptics
         public static bool handSet = false;
         public static string handString = "R";
         public static bool isGrounded = true;
+        public delegate void MyMethod();
 
         private void Awake()
         {
@@ -46,19 +48,19 @@ namespace BendyInkMachine_bHaptics
 
         public static void PlayJumpScareLight()
         {
-            tactsuitVr.PlaybackHaptics("JumpScareLight_Vest");
-            tactsuitVr.PlaybackHaptics("JumpScare_Left_Arms", true, 0.4f);
-            tactsuitVr.PlaybackHaptics("JumpScare_Right_Arms", true, 0.4f);
-            tactsuitVr.PlaybackHaptics("ShotVisor", true, 0.4f);
+            Plugin.tactsuitVr.PlaybackHaptics("JumpScareLight_Vest");
+            Plugin.tactsuitVr.PlaybackHaptics("JumpScare_Left_Arms", true, 0.4f);
+            Plugin.tactsuitVr.PlaybackHaptics("JumpScare_Right_Arms", true, 0.4f);
+            Plugin.tactsuitVr.PlaybackHaptics("ShotVisor", true, 0.4f);
         }
         public static void PlayJumpScareStrong()
         {
-            tactsuitVr.PlaybackHaptics("JumpScare_Vest");
-            tactsuitVr.PlaybackHaptics("JumpScare_Left_Arms");
-            tactsuitVr.PlaybackHaptics("JumpScare_Right_Arms");
-            tactsuitVr.PlaybackHaptics("ShotVisor");
-            tactsuitVr.PlayHapticsWithDelay("HeartBeatFast", 400);
-            tactsuitVr.PlayHapticsWithDelay("HeartBeatFast", 1400);
+            Plugin.tactsuitVr.PlaybackHaptics("JumpScare_Vest");
+            Plugin.tactsuitVr.PlaybackHaptics("JumpScare_Left_Arms");
+            Plugin.tactsuitVr.PlaybackHaptics("JumpScare_Right_Arms");
+            Plugin.tactsuitVr.PlaybackHaptics("ShotVisor");
+            Plugin.tactsuitVr.PlayHapticsWithDelay("HeartBeatFast", 400);
+            Plugin.tactsuitVr.PlayHapticsWithDelay("HeartBeatFast", 1400);
         }
 
         public static void RumbleOnce(float rumbleIntensity = 1.0f, bool withDelay = false, int delay = 0)
@@ -68,28 +70,28 @@ namespace BendyInkMachine_bHaptics
                 Thread thread = new Thread(() =>
                 {
                     Thread.Sleep(delay);
-                    tactsuitVr.PlaybackHaptics("Rumble_Head", true, rumbleIntensity);
-                    tactsuitVr.PlaybackHaptics("Rumble_Left_Arms", true, rumbleIntensity);
-                    tactsuitVr.PlaybackHaptics("Rumble_Right_Arms", true, rumbleIntensity);
-                    tactsuitVr.PlaybackHaptics("Rumble_Vest", true, rumbleIntensity);
+                    Plugin.tactsuitVr.PlaybackHaptics("Rumble_Head", true, rumbleIntensity);
+                    Plugin.tactsuitVr.PlaybackHaptics("Rumble_Left_Arms", true, rumbleIntensity);
+                    Plugin.tactsuitVr.PlaybackHaptics("Rumble_Right_Arms", true, rumbleIntensity);
+                    Plugin.tactsuitVr.PlaybackHaptics("Rumble_Vest", true, rumbleIntensity);
                 });
                 thread.Start();
             }
             else
             {
-                tactsuitVr.PlaybackHaptics("Rumble_Head", true, rumbleIntensity);
-                tactsuitVr.PlaybackHaptics("Rumble_Left_Arms", true, rumbleIntensity);
-                tactsuitVr.PlaybackHaptics("Rumble_Right_Arms", true, rumbleIntensity);
-                tactsuitVr.PlaybackHaptics("Rumble_Vest", true, rumbleIntensity);
+                Plugin.tactsuitVr.PlaybackHaptics("Rumble_Head", true, rumbleIntensity);
+                Plugin.tactsuitVr.PlaybackHaptics("Rumble_Left_Arms", true, rumbleIntensity);
+                Plugin.tactsuitVr.PlaybackHaptics("Rumble_Right_Arms", true, rumbleIntensity);
+                Plugin.tactsuitVr.PlaybackHaptics("Rumble_Vest", true, rumbleIntensity);
             }
         }
 
-        public static void RunFunctionWithDelay(Action callback, int delay)
+        public static void RunFunctionWithDelay(MyMethod method, int delay)
         {
             Thread thread = new Thread(() =>
             {
                 Thread.Sleep(delay);
-                callback();
+                method.Invoke();
             });
             thread.Start();
         }
@@ -116,20 +118,7 @@ namespace BendyInkMachine_bHaptics
         {
             Plugin.tactsuitVr.StopAllHapticFeedback();
         }
-    }
-
-    [HarmonyPatch(typeof(VisionEffectController), "BeginEffect")]
-    public class bhaptics_OnBeginEffect
-    {
-        [HarmonyPostfix]
-        public static void Postfix(VisionEffectController __instance, bool isDeath)
-        {
-            if (isDeath)
-            {
-                Plugin.tactsuitVr.StopAllHapticFeedback();
-            }
-        }
-    }    
+    }   
 
     [HarmonyPatch(typeof(CharacterFootsteps), "PlayJumpAudio")]
     public class bhaptics_OnJump
@@ -138,9 +127,10 @@ namespace BendyInkMachine_bHaptics
         public static void Postfix(CharacterFootsteps __instance)
         {
             Plugin.tactsuitVr.PlaybackHaptics("OnJump");
+            //Plugin.RunFunctionWithDelay(Plugin.PlayJumpScareLight, 1500);
         }
     }
-
+    
     [HarmonyPatch(typeof(PlayerController), "FixedUpdate")]
     public class bhaptics_OnJumpLand
     {
@@ -155,7 +145,7 @@ namespace BendyInkMachine_bHaptics
             Plugin.isGrounded = isGrounded;
         }
     }
-
+    
     [HarmonyPatch(typeof(PlayerController), "EquipWeapon")]
     public class bhaptics_OnEquipWeapon
     {
@@ -524,6 +514,16 @@ namespace BendyInkMachine_bHaptics
             Plugin.PlayJumpScareStrong();
         }
     }
+    
+    [HarmonyPatch(typeof(CH3AliceRevealController), "HandleRevealDialogueOnComplete")]
+    public class bhaptics_OnHandleRevealDialogueOnComplete
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.PlayJumpScareLight();
+        }
+    }
 
     [HarmonyPatch(typeof(CH3BorisJumpscareController), "HandleJumpscareTriggerOnEnter")]
     public class bhaptics_OnHandleJumpscareTriggerOnEnterBoris
@@ -782,7 +782,7 @@ namespace BendyInkMachine_bHaptics
         }
     }    
 
-    [HarmonyPatch(typeof(CH4BridgeMachine), "HandleVisionEffectOnStart")]
+    [HarmonyPatch(typeof(CH4StairwellController), "HandleVisionEffectOnStart")]
     public class bhaptics_OnHandleVisionEffectOnStartCH4
     {
         [HarmonyPostfix]
@@ -793,7 +793,7 @@ namespace BendyInkMachine_bHaptics
         }
     }
 
-    [HarmonyPatch(typeof(CH4BridgeMachine), "HandleVisionEffectOnStop")]
+    [HarmonyPatch(typeof(CH4StairwellController), "HandleVisionEffectOnStop")]
     public class bhaptics_OnHandleVisionEffectOnStopCH4
     {
         [HarmonyPostfix]
@@ -897,7 +897,7 @@ namespace BendyInkMachine_bHaptics
         }
     }
 
-    [HarmonyPatch(typeof(CH3ProjectionistTaskController), "HandleProjectionstOnSpotted")]
+    [HarmonyPatch(typeof(CH4MaintenanceController), "HandleProjectionstOnSpottedHandleProjectionstOnSpotted")]
     public class bhaptics_HandleProjectionstOnSpotted
     {
         [HarmonyPostfix]
@@ -908,7 +908,7 @@ namespace BendyInkMachine_bHaptics
         }
     }
     
-    [HarmonyPatch(typeof(CH3ProjectionistTaskController), "ForceOnSpotted")]
+    [HarmonyPatch(typeof(CH4MaintenanceController), "ForceOnSpotted")]
     public class bhaptics_HandleForceOnSpotted
     {
         [HarmonyPostfix]
