@@ -512,16 +512,7 @@ namespace BendyInkMachine_bHaptics
         public static void Postfix()
         {
             Plugin.PlayJumpScareStrong();
-        }
-    }
-    
-    [HarmonyPatch(typeof(CH3AliceRevealController), "HandleRevealDialogueOnComplete")]
-    public class bhaptics_OnHandleRevealDialogueOnComplete
-    {
-        [HarmonyPostfix]
-        public static void Postfix()
-        {
-            Plugin.PlayJumpScareLight();
+            Plugin.RunFunctionWithDelay(Plugin.PlayJumpScareStrong, 4000);
         }
     }
 
@@ -555,14 +546,14 @@ namespace BendyInkMachine_bHaptics
         }
     }
     
-    [HarmonyPatch(typeof(CH3AliceLairController), "ClearLair")]
+    [HarmonyPatch(typeof(CH3AliceLairController), "HandleAliceControllerOnPressed")]
     public class bhaptics_OnClearLair
     {
         [HarmonyPostfix]
         public static void Postfix()
         {
-            Plugin.RumbleOnce(1.0f);
             Plugin.RumbleOnce(1.0f, true, 200);
+            Plugin.RumbleOnce(1.0f, true, 400);
         }
     }
     
@@ -813,15 +804,15 @@ namespace BendyInkMachine_bHaptics
         }
     }
     
-    [HarmonyPatch(typeof(CH4StairwellController), "Activate")]
+    [HarmonyPatch(typeof(CH4BendyVent), "Activate")]
     public class bhaptics_OnActivateBendyVent
     {
         [HarmonyPostfix]
         public static void Postfix()
         {
             Plugin.PlayJumpScareStrong();
-            Plugin.tactsuitVr.PlayHapticsWithDelay("HeartBeat", 2400);
-            Plugin.tactsuitVr.PlayHapticsWithDelay("HeartBeat", 3400);
+            Plugin.tactsuitVr.StartHeartBeat(true);
+            Plugin.RunFunctionWithDelay(Plugin.tactsuitVr.StopHeartBeat, 8000);
         }
     }
     
@@ -897,19 +888,10 @@ namespace BendyInkMachine_bHaptics
         }
     }
 
-    [HarmonyPatch(typeof(CH4MaintenanceController), "HandleProjectionstOnSpottedHandleProjectionstOnSpotted")]
+    // Bertrum battle system END
+
+    [HarmonyPatch(typeof(CH4MaintenanceController), "HandleProjectionstOnSpotted")]
     public class bhaptics_HandleProjectionstOnSpotted
-    {
-        [HarmonyPostfix]
-        public static void Postfix()
-        {
-            Plugin.PlayJumpScareLight();
-            Plugin.tactsuitVr.StartHeartBeat(true);
-        }
-    }
-    
-    [HarmonyPatch(typeof(CH4MaintenanceController), "ForceOnSpotted")]
-    public class bhaptics_HandleForceOnSpotted
     {
         [HarmonyPostfix]
         public static void Postfix()
@@ -943,14 +925,14 @@ namespace BendyInkMachine_bHaptics
         }
     }
 
-    [HarmonyPatch(typeof(CH4BendyProjAnimationEvents), "Activate")]
-    public class bhaptics_OnHandleCH4BendyProjAnimationEvents
+    [HarmonyPatch(typeof(CH4ProjectionistBendyFight), "Activate")]
+    public class bhaptics_OnHandleCH4ProjectionistBendyFight
     {
         [HarmonyPostfix]
         public static void Postfix()
         {
             Plugin.tactsuitVr.StartHeartBeat();
-            Plugin.RunFunctionWithDelay(bhaptics_OnHandleCH4BendyProjAnimationEvents.battleEvents, 7000);
+            Plugin.RunFunctionWithDelay(bhaptics_OnHandleCH4ProjectionistBendyFight.battleEvents, 7000);
             Plugin.RunFunctionWithDelay(Plugin.PlayJumpScareLight, 7000);
             Plugin.RunFunctionWithDelay(Plugin.PlayJumpScareLight, 16000);
         }
