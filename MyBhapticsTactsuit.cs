@@ -5,8 +5,6 @@ using System.Reflection;
 using System.Threading;
 using Bhaptics.Tact;
 using BendyInkMachine_bHaptics;
-using UnityEngine;
-using System.Threading.Tasks;
 
 namespace MyBhapticsTactsuit
 {

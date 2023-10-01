@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using BendyVR_5.Player.Patches;
 using BepInEx;
@@ -7,7 +6,6 @@ using BepInEx.Logging;
 using DG.Tweening;
 using HarmonyLib;
 using MyBhapticsTactsuit;
-using TMG.Controls;
 using UnityEngine;
 
 namespace BendyInkMachine_bHaptics
@@ -19,7 +17,6 @@ namespace BendyInkMachine_bHaptics
         internal static new ManualLogSource Log;
 #pragma warning restore CS0109
         public static TactsuitVR tactsuitVr;
-        public static bool startedHeart = false;
         public static bool handSet = false;
         public static string handString = "R";
         public static bool isGrounded = true;
@@ -635,6 +632,18 @@ namespace BendyInkMachine_bHaptics
             Plugin.tactsuitVr.PlayHapticsWithDelay("HeartBeat", 1000);
         }
     }
+    
+    [HarmonyPatch(typeof(CH3ProjectionistTaskController), "HandleProjectionistOnDeath")]
+    public class bhaptics_OnHandleProjectionistOnDeath
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.tactsuitVr.StopHeartBeat();
+            Plugin.tactsuitVr.PlaybackHaptics("HeartBeat");
+            Plugin.tactsuitVr.PlayHapticsWithDelay("HeartBeat", 1000);
+        }
+    }
 
 
     // LIFT MOVEMENTS RUMBLES
@@ -716,6 +725,290 @@ namespace BendyInkMachine_bHaptics
         public static void Postfix(Sequence __result)
         {
             __result.OnStart(() => { Plugin.PlayJumpScareStrong(); });            
+        }
+    }
+
+    #endregion
+
+    #region CH4 JUMPSCARES
+    
+    [HarmonyPatch(typeof(CH4AccountingController), "HandleVisionEffectOnStart")]
+    public class bhaptics_OnHandleVisionEffectOnStart
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.PlayJumpScareStrong();
+        }
+    }
+    [HarmonyPatch(typeof(CH4AccountingController), "HandleVisionEffectOnStop")]
+    public class bhaptics_OnHandleVisionEffectOnStop
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.PlayJumpScareLight();
+        }
+    }
+    
+    [HarmonyPatch(typeof(CH4AbyssController), "PipeLeverOnComplete")]
+    public class bhaptics_OnPipeLeverOnComplete
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.tactsuitVr.StartRumble(0.1f);
+        }
+    }
+    [HarmonyPatch(typeof(CH4AbyssController), "PipeRiseOnComplete")]
+    public class bhaptics_OnPipeRiseOnComplete
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.tactsuitVr.StopRumble();
+        }
+    }
+    
+    [HarmonyPatch(typeof(CH4BridgeMachine), "HandleCartOnBreakdown")]
+    public class bhaptics_OnHandleCartOnBreakdown
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.PlayJumpScareLight();
+            Plugin.tactsuitVr.StartHeartBeat();
+            Plugin.RunFunctionWithDelay(Plugin.tactsuitVr.StopHeartBeat, 15000);
+        }
+    }    
+
+    [HarmonyPatch(typeof(CH4BridgeMachine), "HandleVisionEffectOnStart")]
+    public class bhaptics_OnHandleVisionEffectOnStartCH4
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.PlayJumpScareLight();
+            Plugin.tactsuitVr.StartHeartBeat();
+        }
+    }
+
+    [HarmonyPatch(typeof(CH4BridgeMachine), "HandleVisionEffectOnStop")]
+    public class bhaptics_OnHandleVisionEffectOnStopCH4
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.tactsuitVr.StopHeartBeat();
+        }
+    }
+    
+    [HarmonyPatch(typeof(CH4StairwellController), "HandleOnDoorOpen")]
+    public class bhaptics_OnHandleOnDoorOpen
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.PlayJumpScareLight();
+        }
+    }
+    
+    [HarmonyPatch(typeof(CH4StairwellController), "Activate")]
+    public class bhaptics_OnActivateBendyVent
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.PlayJumpScareStrong();
+            Plugin.tactsuitVr.PlayHapticsWithDelay("HeartBeat", 2400);
+            Plugin.tactsuitVr.PlayHapticsWithDelay("HeartBeat", 3400);
+        }
+    }
+    
+    [HarmonyPatch(typeof(CH4WarehouseController), "HandleEntranceTriggerOnEnter")]
+    public class bhaptics_OnHandleEntranceTriggerOnEnter
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.PlayJumpScareLight();
+        }
+    }
+
+    // Bertrum battle system
+    
+    [HarmonyPatch(typeof(CH4BertrumController), "DestroyWorkbench")]
+    public class bhaptics_OnDestroyWorkbench
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.RumbleOnce(1f);
+        }
+    }
+
+    [HarmonyPatch(typeof(CH4BertrumController), "DOSpinSequence")]
+    public class bhaptics_OnDOSpinSequence
+    {
+        public static bool isActive = true;
+        [HarmonyPostfix]
+        public static void Postfix(CH4BertrumController __instance)
+        {
+            if(isActive)
+            {
+                Plugin.tactsuitVr.StartRumble(0.1f);
+            }
+        }
+    }
+    [HarmonyPatch(typeof(CH4BertrumController), "DOSpinInteruption")]
+    public class bhaptics_OnDOSpinInteruption
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.tactsuitVr.StopRumble();
+        }
+    }
+    [HarmonyPatch(typeof(CH4BertrumController), "DOAttack")]
+    public class bhaptics_OnDOAttack
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.RumbleOnce(1f, true, 800);
+        }
+    }
+    [HarmonyPatch(typeof(CH4BertrumController), "DODeath")]
+    public class bhaptics_OnDODeath
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            bhaptics_OnDOSpinSequence.isActive = false;
+            Plugin.tactsuitVr.StopRumble();
+            Plugin.RumbleOnce(0.5f, true, 2000);
+            Plugin.RumbleOnce(0.5f, true, 3500);
+            Plugin.RumbleOnce(0.5f, true, 5000);
+            Plugin.RumbleOnce(0.5f, true, 6500);
+            Plugin.RumbleOnce(1f, true, 8000);
+            Plugin.RumbleOnce(1f, true, 9000);
+            Plugin.RumbleOnce(1f, true, 10000);
+            Plugin.RumbleOnce(0.2f, true, 11500);
+        }
+    }
+
+    [HarmonyPatch(typeof(CH3ProjectionistTaskController), "HandleProjectionstOnSpotted")]
+    public class bhaptics_HandleProjectionstOnSpotted
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.PlayJumpScareLight();
+            Plugin.tactsuitVr.StartHeartBeat(true);
+        }
+    }
+    
+    [HarmonyPatch(typeof(CH3ProjectionistTaskController), "ForceOnSpotted")]
+    public class bhaptics_HandleForceOnSpotted
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.PlayJumpScareLight();
+            Plugin.tactsuitVr.StartHeartBeat(true);
+        }
+    }
+
+    [HarmonyPatch(typeof(CH4MaintenanceController), "HandleProjectionistOnRetreat")]
+    public class bhaptics_OnHandleProjectionistOnRetreatCH4
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.tactsuitVr.StopHeartBeat();
+            Plugin.tactsuitVr.PlaybackHaptics("HeartBeat");
+            Plugin.tactsuitVr.PlayHapticsWithDelay("HeartBeat", 1000);
+        }
+    }
+
+    [HarmonyPatch(typeof(CH4MaintenanceController), "HandleProjectionistOnDeath")]
+    public class bhaptics_OnHandleProjectionistOnDeathCH4
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.tactsuitVr.StopHeartBeat();
+            Plugin.tactsuitVr.PlaybackHaptics("HeartBeat");
+            Plugin.tactsuitVr.PlayHapticsWithDelay("HeartBeat", 1000);
+        }
+    }
+
+    [HarmonyPatch(typeof(CH4BendyProjAnimationEvents), "Activate")]
+    public class bhaptics_OnHandleCH4BendyProjAnimationEvents
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.tactsuitVr.StartHeartBeat();
+            Plugin.RunFunctionWithDelay(bhaptics_OnHandleCH4BendyProjAnimationEvents.battleEvents, 7000);
+            Plugin.RunFunctionWithDelay(Plugin.PlayJumpScareLight, 7000);
+            Plugin.RunFunctionWithDelay(Plugin.PlayJumpScareLight, 16000);
+        }
+
+        public static void battleEvents()
+        {
+            Plugin.tactsuitVr.StopHeartBeat();
+            Plugin.tactsuitVr.StartHeartBeat(true);
+        }
+    }
+    
+    [HarmonyPatch(typeof(CH4MaintenanceController), "HandleBendyProjFightOnComplete")]
+    public class bhaptics_OnHandleBendyProjFightOnComplete
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.tactsuitVr.StopHeartBeat();
+        }
+    }
+        
+    [HarmonyPatch(typeof(BruteBorisAnimationEvents), "RevealGrabCart")]
+    public class bhaptics_OnRevealGrabCart
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.PlayJumpScareLight();
+        }
+    }
+    
+    [HarmonyPatch(typeof(BruteBorisAnimationEvents), "ThrowCart")]
+    public class bhaptics_OnThrowCart
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.RumbleOnce(0.2f);
+        }
+    }
+
+    [HarmonyPatch(typeof(BruteBorisAnimationEvents), "PlaySmashAudio")]
+    public class bhaptics_OnPlaySmashAudio
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.PlayJumpScareStrong();
+        }
+    }
+    
+    [HarmonyPatch(typeof(CH4ClosingSequenceController), "AliceHit")]
+    public class bhaptics_OnAliceHit
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.PlayJumpScareLight();
         }
     }
 
