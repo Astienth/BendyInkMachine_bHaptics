@@ -7,6 +7,7 @@ using BepInEx.Logging;
 using DG.Tweening;
 using HarmonyLib;
 using MyBhapticsTactsuit;
+using S13Audio;
 using UnityEngine;
 
 namespace BendyInkMachine_bHaptics
@@ -1033,26 +1034,10 @@ namespace BendyInkMachine_bHaptics
         public static void Postfix()
         {
             Plugin.RumbleOnce(0.2f);
-        }
-    }
-
-    [HarmonyPatch(typeof(BruteBorisAi), "ThrowCart")]
-    public class bhaptics_OnThrowCart
-    {
-        [HarmonyPostfix]
-        public static void Postfix()
-        {
-            Plugin.RumbleOnce(0.4f);
-        }
-    }
-
-    [HarmonyPatch(typeof(BruteBorisAi), "PlaySmashAudio")]
-    public class bhaptics_OnPlaySmashAudio
-    {
-        [HarmonyPostfix]
-        public static void Postfix()
-        {
-            Plugin.PlayJumpScareStrong();
+            Plugin.RumbleOnce(0.2f, true, 10000);
+            Plugin.RumbleOnce(0.2f, true, 12000);
+            Plugin.RumbleOnce(0.5f, true, 14000);
+            Plugin.RunFunctionWithDelay(Plugin.PlayJumpScareStrong, 15500);
         }
     }
     
@@ -1063,6 +1048,159 @@ namespace BendyInkMachine_bHaptics
         public static void Postfix()
         {
             Plugin.PlayJumpScareLight();
+        }
+    }
+
+    #endregion
+
+    #region CH5 JUMPSCARES
+    
+    [HarmonyPatch(typeof(CH5Administration), "HandleInkMakerOnComplete")]
+    public class bhaptics_OnHandleInkMakerOnComplete
+    {
+        [HarmonyPostfix]
+        public static void Postfix(CH5Administration __instance)
+        {
+            if(!Traverse.Create(__instance).Field("m_HasUsedMachine").GetValue<bool>())
+            {
+                Plugin.PlayJumpScareLight();
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(CH5LostHarborSammyController), "ActivateSammy")]
+    public class bhaptics_OnActivateSammy
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.PlayJumpScareStrong();
+        }
+    }
+    
+    [HarmonyPatch(typeof(CH5BendyScare), "SpawnBendy")]
+    public class bhaptics_OnSpawnBendy
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.PlayJumpScareLight();
+            Plugin.tactsuitVr.StartHeartBeat();
+        }
+    }    
+
+    [HarmonyPatch(typeof(CH5BendyScare), "HandleBendyOnWaypointComplete")]
+    public class bhaptics_OnHandleBendyOnWaypointCompleteCH5
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.tactsuitVr.StopHeartBeat();
+        }
+    }
+
+    [HarmonyPatch(typeof(S13AudioManager), "PlayAudio")]
+    public class bhaptics_OnHandleBendyThroneAppears
+    {
+        [HarmonyPostfix]
+        public static void Postfix(S13AudioManager __instance, string soundId)
+        {
+            if(soundId == "sfx_beast_reveal_anim")
+            {
+                Plugin.PlayJumpScareStrong();
+                Plugin.tactsuitVr.StartHeartBeat();
+            }
+        }
+    }
+    
+    [HarmonyPatch(typeof(CH5ThroneRoom), "RevealOnComplete")]
+    public class bhaptics_OnRevealOnComplete
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.RumbleOnce(1f);
+            Plugin.tactsuitVr.StartHeartBeat();
+        }
+    }
+
+    [HarmonyPatch(typeof(CH5BendyArena), "HandleMazeExitTriggerOnEnter")]
+    public class bhaptics_OnHandleMazeExitTriggerOnEnter
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.tactsuitVr.StopHeartBeat();
+        }
+    }
+
+    [HarmonyPatch(typeof(CH5BendyArena), "HandleOnStartUpComplete")]
+    public class bhaptics_OnHandleOnStartUpComplete
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.tactsuitVr.StartHeartBeat();
+        }
+    }
+    
+    [HarmonyPatch(typeof(CH5BendyArena), "HandlePillarOnHit")]
+    public class bhaptics_OnHandlePillarOnHit
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.RumbleOnce(1f);
+        }
+    }
+    
+    [HarmonyPatch(typeof(CH5BendyArena), "HandlePowerStationOnPowerShutDown")]
+    public class bhaptics_OnHandlePowerStationOnPowerShutDown
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.tactsuitVr.StopHeartBeat();
+        }
+    }
+
+    [HarmonyPatch(typeof(CH5TheEnd), "TheEnd1")]
+    public class bhaptics_OnTheEnd1
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.RumbleOnce(0.2f);
+        }
+    }
+    [HarmonyPatch(typeof(CH5TheEnd), "TheEnd2")]
+    public class bhaptics_OnTheEnd2
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.RumbleOnce(0.2f);
+        }
+    }
+    
+    [HarmonyPatch(typeof(CH5TheEnd), "TheEndRest")]
+    public class bhaptics_OnTheEndRest
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.RumbleOnce(0.5f);
+        }
+    }
+
+    [HarmonyPatch(typeof(CH5TheEnd), "THE_END")]
+    public class bhaptics_OnTHE_END
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.RumbleOnce(0.8f);
+            Plugin.RumbleOnce(1f, true, 1000);
         }
     }
 
