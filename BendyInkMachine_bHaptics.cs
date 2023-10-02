@@ -1054,9 +1054,25 @@ namespace BendyInkMachine_bHaptics
     #endregion
 
     #region CH5 JUMPSCARES
-    
-    // TODO sammy battle, alice and tom fight, planck fall, 
 
+    [HarmonyPatch(typeof(BoatAudioControl), "EngineOn")]
+    public class bhaptics_OnEngineOn
+    {
+        [HarmonyPostfix]
+        public static void Postfix(CH5Administration __instance)
+        {
+            Plugin.tactsuitVr.StartRumble(0.1f);
+        }
+    }
+    [HarmonyPatch(typeof(BoatAudioControl), "EngineOff")]
+    public class bhaptics_OnEngineOff
+    {
+        [HarmonyPostfix]
+        public static void Postfix(CH5Administration __instance)
+        {
+            Plugin.tactsuitVr.StopRumble();
+        }
+    }
 
     [HarmonyPatch(typeof(CH5Administration), "HandleInkMakerOnComplete")]
     public class bhaptics_OnHandleInkMakerOnComplete
@@ -1081,6 +1097,46 @@ namespace BendyInkMachine_bHaptics
         }
     }
     
+    [HarmonyPatch(typeof(CH5LostHarborSammyController), "HandleDeathTriggerOnEnter")]
+    public class bhaptics_OnHandleDeathTriggerOnEnter
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.PlayJumpScareStrong();
+        }
+    }
+    
+    [HarmonyPatch(typeof(CH5LostHarbour), "RumbleOnComplete")]
+    public class bhaptics_OnRumbleOnComplete
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.RumbleOnce(0.5f);
+        }
+    }
+
+    [HarmonyPatch(typeof(CH5LostHarbour), "HandleFallTriggerOnEnter")]
+    public class bhaptics_OnHandleFallTriggerOnEnter
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.PlayJumpScareStrong();
+        }
+    }
+    
+    [HarmonyPatch(typeof(CH5LostHarbour), "OnLanding")]
+    public class bhaptics_OnLanding
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.RumbleOnce(1f);
+        }
+    }
+
     [HarmonyPatch(typeof(CH5BendyScare), "SpawnBendy")]
     public class bhaptics_OnSpawnBendy
     {

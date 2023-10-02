@@ -59,7 +59,7 @@ namespace MyBhapticsTactsuit
             try
             {
 #pragma warning disable CS0618 // remove warning that the C# library is deprecated
-                hapticPlayer = new HapticPlayer("Compound_bhaptics", "Compound_bhaptics");
+                hapticPlayer = new HapticPlayer("BendyInkMachine_bHaptics", "BendyInkMachine_bHaptics");
 #pragma warning restore CS0618
                 suitDisabled = false;
             }
