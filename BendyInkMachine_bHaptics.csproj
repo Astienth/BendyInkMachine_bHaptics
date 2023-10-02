@@ -48,8 +48,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Bhaptics.Tact">
-      <HintPath>..\..\..\..\GAMES\Bendy and the Ink Machine\BepInEx\plugins\Bhaptics.Tact.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>libs\Bhaptics.Tact.dll</HintPath>
     </Reference>
     <Reference Include="DOTween">
       <HintPath>..\..\..\..\GAMES\Bendy and the Ink Machine\Bendy and the Ink Machine_Data\Managed\DOTween.dll</HintPath>

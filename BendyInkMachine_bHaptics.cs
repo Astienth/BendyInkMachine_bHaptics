@@ -127,7 +127,6 @@ namespace BendyInkMachine_bHaptics
         public static void Postfix(CharacterFootsteps __instance)
         {
             Plugin.tactsuitVr.PlaybackHaptics("OnJump");
-            //Plugin.RunFunctionWithDelay(Plugin.PlayJumpScareLight, 1500);
         }
     }
     
@@ -512,7 +511,7 @@ namespace BendyInkMachine_bHaptics
         public static void Postfix()
         {
             Plugin.PlayJumpScareStrong();
-            Plugin.RunFunctionWithDelay(Plugin.PlayJumpScareStrong, 4000);
+            Plugin.RunFunctionWithDelay(Plugin.PlayJumpScareStrong, 3500);
         }
     }
 
@@ -542,7 +541,7 @@ namespace BendyInkMachine_bHaptics
         [HarmonyPostfix]
         public static void Postfix()
         {
-            Plugin.RunFunctionWithDelay(Plugin.PlayJumpScareLight, 200);
+            Plugin.RunFunctionWithDelay(Plugin.PlayJumpScareLight, 600);
         }
     }
     
@@ -578,9 +577,9 @@ namespace BendyInkMachine_bHaptics
             Plugin.tactsuitVr.StartHeartBeat(true);
         }
     }
-
-    [HarmonyPatch(typeof(CH3BendyController), "StopChaseMusic")]
-    public class bhaptics_OnStopChaseMusic
+    
+    [HarmonyPatch(typeof(CH3BendyController), "HandleBendyOnTrackingLost")]
+    public class bhaptics_OnHandleBendyOnTrackingLost
     {
         [HarmonyPostfix]
         public static void Postfix()
@@ -588,6 +587,16 @@ namespace BendyInkMachine_bHaptics
             Plugin.tactsuitVr.StopHeartBeat();
             Plugin.tactsuitVr.PlaybackHaptics("HeartBeat");
             Plugin.tactsuitVr.PlayHapticsWithDelay("HeartBeat", 1000);
+        }
+    }
+    
+    [HarmonyPatch(typeof(CH3BendyController), "HandleBendyDespawnerOnEnter")]
+    public class bhaptics_OnHandleBendyDespawnerOnEnter
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.tactsuitVr.StopHeartBeat();
         }
     }
 
