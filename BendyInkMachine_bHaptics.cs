@@ -1055,6 +1055,9 @@ namespace BendyInkMachine_bHaptics
 
     #region CH5 JUMPSCARES
     
+    // TODO sammy battle, alice and tom fight, planck fall, 
+
+
     [HarmonyPatch(typeof(CH5Administration), "HandleInkMakerOnComplete")]
     public class bhaptics_OnHandleInkMakerOnComplete
     {
@@ -1201,6 +1204,7 @@ namespace BendyInkMachine_bHaptics
         {
             Plugin.RumbleOnce(0.8f);
             Plugin.RumbleOnce(1f, true, 1000);
+            Plugin.RumbleOnce(1f, true, 2000);
         }
     }
 
