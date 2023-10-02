@@ -584,6 +584,7 @@ namespace BendyInkMachine_bHaptics
         [HarmonyPostfix]
         public static void Postfix()
         {
+            Plugin.Log.LogWarning("STOP CHASE 1");
             Plugin.tactsuitVr.StopHeartBeat();
             Plugin.tactsuitVr.PlaybackHaptics("HeartBeat");
             Plugin.tactsuitVr.PlayHapticsWithDelay("HeartBeat", 1000);
@@ -596,6 +597,29 @@ namespace BendyInkMachine_bHaptics
         [HarmonyPostfix]
         public static void Postfix()
         {
+            Plugin.Log.LogWarning("STOP CHASE 2");
+            Plugin.tactsuitVr.StopHeartBeat();
+        }
+    }
+    
+    [HarmonyPatch(typeof(CH3BendyController), "StopChaseMusic")]
+    public class bhaptics_OnStopChaseMusic
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.Log.LogWarning("STOP CHASE 3");
+            Plugin.tactsuitVr.StopHeartBeat();
+        }
+    }
+
+    [HarmonyPatch(typeof(CH3BendyController), "HandleBendyOnWaypointComplete")]
+    public class bhaptics_OnHandleBendyOnWaypointComplete
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.Log.LogWarning("STOP CHASE 4");
             Plugin.tactsuitVr.StopHeartBeat();
         }
     }
@@ -875,7 +899,7 @@ namespace BendyInkMachine_bHaptics
         [HarmonyPostfix]
         public static void Postfix()
         {
-            Plugin.RumbleOnce(1f, true, 800);
+            Plugin.RumbleOnce(1f, true, 1000);
         }
     }
     [HarmonyPatch(typeof(CH4BertrumController), "DODeath")]
@@ -962,7 +986,36 @@ namespace BendyInkMachine_bHaptics
             Plugin.tactsuitVr.StopHeartBeat();
         }
     }
-        
+    
+    [HarmonyPatch(typeof(CH4HauntedHouseController), "HandleCartOnEnter")]
+    public class bhaptics_OnHandleCartOnEnter
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.tactsuitVr.StartRumble(0.2f);
+        }
+    }
+    [HarmonyPatch(typeof(CH4HauntedHouseController), "CartRideOnComplete")]
+    public class bhaptics_OnCartRideOnComplete
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.tactsuitVr.StopRumble();
+        }
+    }
+    
+    [HarmonyPatch(typeof(CH4HauntedHouseController), "HandlePopupTriggerOnEnter")]
+    public class bhaptics_OnHandlePopupTriggerOnEnter
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.PlayJumpScareLight();
+        }
+    }
+
     [HarmonyPatch(typeof(BruteBorisAnimationEvents), "RevealGrabCart")]
     public class bhaptics_OnRevealGrabCart
     {
@@ -973,8 +1026,8 @@ namespace BendyInkMachine_bHaptics
         }
     }
     
-    [HarmonyPatch(typeof(BruteBorisAnimationEvents), "ThrowCart")]
-    public class bhaptics_OnThrowCart
+    [HarmonyPatch(typeof(BruteBorisAi), "PickupCart")]
+    public class bhaptics_OnPickupCart
     {
         [HarmonyPostfix]
         public static void Postfix()
@@ -983,7 +1036,17 @@ namespace BendyInkMachine_bHaptics
         }
     }
 
-    [HarmonyPatch(typeof(BruteBorisAnimationEvents), "PlaySmashAudio")]
+    [HarmonyPatch(typeof(BruteBorisAi), "ThrowCart")]
+    public class bhaptics_OnThrowCart
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            Plugin.RumbleOnce(0.4f);
+        }
+    }
+
+    [HarmonyPatch(typeof(BruteBorisAi), "PlaySmashAudio")]
     public class bhaptics_OnPlaySmashAudio
     {
         [HarmonyPostfix]
