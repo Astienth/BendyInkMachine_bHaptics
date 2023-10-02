@@ -106,7 +106,7 @@ namespace BendyInkMachine_bHaptics
         public static void Postfix(PlayerController __instance)
         {
             Plugin.tactsuitVr.PlaybackHaptics("Death");
-            Plugin.tactsuitVr.StopAllHapticFeedback();
+            Plugin.tactsuitVr.StopThreads();
         }
     }
     
@@ -116,7 +116,7 @@ namespace BendyInkMachine_bHaptics
         [HarmonyPostfix]
         public static void Postfix(PlayerController __instance)
         {
-            Plugin.tactsuitVr.StopAllHapticFeedback();
+            Plugin.tactsuitVr.StopThreads();
         }
     }   
 
@@ -175,7 +175,7 @@ namespace BendyInkMachine_bHaptics
         public static void Postfix()
         {
             Plugin.tactsuitVr.PlaybackHaptics("Heal");
-            Plugin.tactsuitVr.StopAllHapticFeedback();
+            Plugin.tactsuitVr.StopThreads();
         }
     }
 
@@ -436,7 +436,7 @@ namespace BendyInkMachine_bHaptics
         [HarmonyPostfix]
         public static void Postfix()
         {
-            Plugin.tactsuitVr.StopAllHapticFeedback();
+            Plugin.tactsuitVr.StopThreads();
         }
     }
         
