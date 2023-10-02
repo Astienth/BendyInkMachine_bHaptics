@@ -121,7 +121,8 @@ namespace MyBhapticsTactsuit
         public void PlaybackHaptics(String key, bool forced = true, float intensity = 1.0f, float duration = 1.0f)
         {
             if (suitDisabled) { return; }
-            if (FeedbackMap.ContainsKey(key))
+            Dictionary<String, FileInfo> MapCopy = new Dictionary<String, FileInfo>(FeedbackMap);
+            if (MapCopy.ContainsKey(key))
             {
                 ScaleOption scaleOption = new ScaleOption(intensity, duration);
                 if (hapticPlayer.IsPlaying() && !forced)

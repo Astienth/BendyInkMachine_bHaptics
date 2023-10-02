@@ -1023,16 +1023,6 @@ namespace BendyInkMachine_bHaptics
         public static void Postfix()
         {
             Plugin.PlayJumpScareLight();
-        }
-    }
-    
-    [HarmonyPatch(typeof(BruteBorisAi), "PickupCart")]
-    public class bhaptics_OnPickupCart
-    {
-        [HarmonyPostfix]
-        public static void Postfix()
-        {
-            Plugin.RumbleOnce(0.2f);
             Plugin.RumbleOnce(0.2f, true, 10000);
             Plugin.RumbleOnce(0.2f, true, 12000);
             Plugin.RumbleOnce(0.5f, true, 14000);
