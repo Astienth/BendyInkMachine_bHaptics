@@ -1,10 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography;
 using System.Threading;
 using BendyVR_5.Player.Patches;
 using BepInEx;
 using BepInEx.Logging;
+using Bhaptics.Tact;
 using DG.Tweening;
 using HarmonyLib;
+using InControl;
 using MyBhapticsTactsuit;
 using S13Audio;
 using UnityEngine;
@@ -96,6 +101,69 @@ namespace BendyInkMachine_bHaptics
             thread.Start();
         }
     }
+
+    #region bhaptics lib fixes
+
+    [HarmonyPatch(typeof(SubmitRequest), "ToJsonObject")]
+    public class bhaptics_ToJsonObject
+    {
+        internal interface IParsable
+        {
+            JSONObject ToJsonObject();
+        }
+
+        [HarmonyPrefix]
+        public static bool Prefix(SubmitRequest __instance, ref JSONObject __result)
+        {
+            JSONObject jSONObject = new JSONObject();
+            jSONObject["type"] = __instance.Type;
+            jSONObject["key"] = __instance.Key;
+            if (__instance.Parameters != null)
+            {
+                JSONObject jSONObject2 = new JSONObject();
+                foreach (KeyValuePair<string, object> parameter in __instance.Parameters.ToList())
+                {
+                    try
+                    {
+                        string key = parameter.Key;
+                        object value = parameter.Value;
+                        IParsable parsable = value as IParsable;
+                        if (parsable != null)
+                        {
+                            jSONObject2[key] = parsable.ToJsonObject();
+                            continue;
+                        }
+
+                        try
+                        {
+                            string text = (string)value;
+                            jSONObject2[key] = text;
+                        }
+                        catch (Exception)
+                        {
+                            float num = (float)value;
+                            jSONObject2[key] = num;
+                        }
+                    }
+                    catch (Exception)
+                    {
+                    }
+                }
+
+                jSONObject["Parameters"] = jSONObject2;
+            }
+
+            if (__instance.Frame != null)
+            {
+                jSONObject["Frame"] = __instance.Frame.ToJsonObject();
+            }
+
+            __result = jSONObject;
+            return false;
+        }
+    }
+
+    #endregion
 
     #region Player Physical Events
 
@@ -1024,9 +1092,9 @@ namespace BendyInkMachine_bHaptics
         {
             Plugin.PlayJumpScareLight();
             Plugin.RumbleOnce(0.2f, true, 10000);
-            Plugin.RumbleOnce(0.2f, true, 12000);
-            Plugin.RumbleOnce(0.5f, true, 14000);
-            Plugin.RunFunctionWithDelay(Plugin.PlayJumpScareStrong, 15500);
+            Plugin.RumbleOnce(0.2f, true, 11000);
+            Plugin.RumbleOnce(0.5f, true, 13000);
+            Plugin.RunFunctionWithDelay(Plugin.PlayJumpScareStrong, 14000);
         }
     }
     
