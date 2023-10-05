@@ -171,7 +171,6 @@ namespace BendyInkMachine_bHaptics
             }
 
             __result = jSONObject;
-            Plugin.Log.LogWarning("PARAMS " + jSONObject.ToString());
             return false;
         }
     }
