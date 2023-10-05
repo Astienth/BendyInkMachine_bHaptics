@@ -127,9 +127,21 @@ namespace BendyInkMachine_bHaptics
                     {
                         string key = parameter.Key;
                         object value = parameter.Value;
-                        IParsable parsable = value as IParsable;
-                        if (parsable != null)
+                        if (value is RotationOption)
                         {
+                            RotationOption parsable = (RotationOption)value;
+                            jSONObject2[key] = parsable.ToJsonObject();
+                            continue;
+                        }
+                        if (value is ScaleOption)
+                        {
+                            ScaleOption parsable = (ScaleOption)value;
+                            jSONObject2[key] = parsable.ToJsonObject();
+                            continue;
+                        }
+                        if (value is PlayerRequest)
+                        {
+                            PlayerRequest parsable = (PlayerRequest)value;
                             jSONObject2[key] = parsable.ToJsonObject();
                             continue;
                         }
@@ -159,6 +171,7 @@ namespace BendyInkMachine_bHaptics
             }
 
             __result = jSONObject;
+            Plugin.Log.LogWarning("PARAMS " + jSONObject.ToString());
             return false;
         }
     }
