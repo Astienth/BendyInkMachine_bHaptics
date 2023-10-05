@@ -819,16 +819,7 @@ namespace BendyInkMachine_bHaptics
         public static void Postfix()
         {
             Plugin.PlayJumpScareLight();
-        }
-    }
-    
-    [HarmonyPatch(typeof(CH3ClosingSequenceController), "DOBorisPull")]
-    public class bhaptics_OnDOBorisPull
-    {
-        [HarmonyPostfix]
-        public static void Postfix(Sequence __result)
-        {
-            __result.OnStart(() => { Plugin.PlayJumpScareStrong(); });            
+            Plugin.RunFunctionWithDelay(Plugin.PlayJumpScareStrong, 2500);
         }
     }
 
