@@ -27,6 +27,7 @@ namespace MyBhapticsTactsuit
 
         public string heartBeatEffect = "HeartBeat";
         public float rumbleIntensity = 1.0f;
+        public int heartbeatCount = 0;
 
         public void HeartBeatFunc()
         {
@@ -35,6 +36,11 @@ namespace MyBhapticsTactsuit
                 // Check if reset event is active
                 HeartBeat_mrse.WaitOne();
                 PlaybackHaptics(heartBeatEffect);
+                if(heartbeatCount > 45)
+                {
+                    StopHeartBeat();
+                }
+                heartbeatCount++;
                 Thread.Sleep(1000);
             }
         }
@@ -149,6 +155,7 @@ namespace MyBhapticsTactsuit
         public void StopHeartBeat()
         {
             HeartBeat_mrse.Reset();
+            heartbeatCount = 0;
         }
 
         public void StartRumble(float intensity)

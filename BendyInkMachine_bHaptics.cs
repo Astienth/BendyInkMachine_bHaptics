@@ -104,14 +104,44 @@ namespace BendyInkMachine_bHaptics
 
     #region bhaptics lib fixes
 
-    [HarmonyPatch(typeof(SubmitRequest), "ToJsonObject")]
-    public class bhaptics_ToJsonObject
-    {
-        internal interface IParsable
-        {
-            JSONObject ToJsonObject();
-        }
 
+    [HarmonyPatch(typeof(PlayerRequest), "ToJsonObject")]
+    public class bhaptics_ToJsonObjectPlayerRequest
+    {
+        [HarmonyPrefix]
+        public static bool Prefix(PlayerRequest __instance, ref JSONObject __result)
+        {
+            try
+            {
+                JSONArray jsonArray1 = new JSONArray();
+                foreach (RegisterRequest registerRequest in __instance.Register.ToList())
+                {
+                    JSONObject aItem = new JSONObject();
+                    aItem["Key"] = (JSONNode)registerRequest.Key;
+                    aItem["Project"] = (JSONNode)registerRequest.Project.ToJsonObject();
+                    jsonArray1.Add((JSONNode)aItem);
+                }
+                JSONArray jsonArray2 = new JSONArray();
+                foreach (SubmitRequest submitRequest in __instance.Submit.ToList())
+                    jsonArray2.Add((JSONNode)submitRequest.ToJsonObject());
+                JSONObject jsonObject = new JSONObject();
+                jsonObject["Register"] = (JSONNode)jsonArray1;
+                jsonObject["Submit"] = (JSONNode)jsonArray2;
+                __result = jsonObject;
+                return false;
+
+            } catch (Exception e)
+            {
+                JSONObject jsonObject = new JSONObject();
+                __result = jsonObject;
+                return false;
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(SubmitRequest), "ToJsonObject")]
+    public class bhaptics_ToJsonObjectSubmitRequest
+    {
         [HarmonyPrefix]
         public static bool Prefix(SubmitRequest __instance, ref JSONObject __result)
         {
@@ -145,7 +175,13 @@ namespace BendyInkMachine_bHaptics
                             jSONObject2[key] = parsable.ToJsonObject();
                             continue;
                         }
-
+                        if (value is SubmitRequest)
+                        {
+                            SubmitRequest parsable = (SubmitRequest)value;
+                            jSONObject2[key] = parsable.ToJsonObject();
+                            continue;
+                        }
+                        
                         try
                         {
                             string text = (string)value;
@@ -1218,28 +1254,20 @@ namespace BendyInkMachine_bHaptics
         }
     }
 
-    [HarmonyPatch(typeof(S13AudioManager), "PlayAudio")]
+    [HarmonyPatch(typeof(CH5ThroneRoom), "HandleAudioLogOnInteracted")]
     public class bhaptics_OnHandleBendyThroneAppears
-    {
-        [HarmonyPostfix]
-        public static void Postfix(S13AudioManager __instance, string soundId)
-        {
-            if(soundId == "sfx_beast_reveal_anim")
-            {
-                Plugin.PlayJumpScareStrong();
-                Plugin.tactsuitVr.StartHeartBeat();
-            }
-        }
-    }
-    
-    [HarmonyPatch(typeof(CH5ThroneRoom), "RevealOnComplete")]
-    public class bhaptics_OnRevealOnComplete
     {
         [HarmonyPostfix]
         public static void Postfix()
         {
-            Plugin.RumbleOnce(1f);
-            Plugin.tactsuitVr.StartHeartBeat();
+            Plugin.RunFunctionWithDelay(() => { 
+                Plugin.PlayJumpScareStrong();
+                Plugin.tactsuitVr.StartHeartBeat();
+            }, 45500);
+            Plugin.RunFunctionWithDelay(() => {
+                Plugin.RumbleOnce(1f);
+                Plugin.tactsuitVr.StopHeartBeat();
+            }, 75500);
         }
     }
 
@@ -1318,9 +1346,10 @@ namespace BendyInkMachine_bHaptics
         [HarmonyPostfix]
         public static void Postfix()
         {
-            Plugin.RumbleOnce(0.8f);
-            Plugin.RumbleOnce(1f, true, 1000);
-            Plugin.RumbleOnce(1f, true, 2000);
+            Plugin.RumbleOnce(0.8f, true, 500);
+            Plugin.RumbleOnce(1f, true, 1500);
+            Plugin.RumbleOnce(1f, true, 2500);
+            Plugin.RumbleOnce(1f, true, 3500);
         }
     }
 
