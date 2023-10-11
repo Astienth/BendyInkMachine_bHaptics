@@ -1203,13 +1203,13 @@ namespace BendyInkMachine_bHaptics
         }
     }
     
-    [HarmonyPatch(typeof(CH5LostHarbour), "RumbleOnComplete")]
-    public class bhaptics_OnRumbleOnComplete
+    [HarmonyPatch(typeof(CH5LostHarbour), "HandleSammyControllerOnComplete")]
+    public class bhaptics_OnHandleSammyControllerOnComplete
     {
         [HarmonyPostfix]
         public static void Postfix()
         {
-            Plugin.RumbleOnce(0.5f);
+            Plugin.RumbleOnce(0.5f, true, 4000);
         }
     }
 
