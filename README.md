@@ -1,5 +1,3 @@
-# Bendy and the ink machine bHaptics support
-
 <img src="https://cdn.akamai.steamstatic.com/steam/apps/622650/header.jpg?t=1669217551" />
 
 # Description
@@ -17,11 +15,10 @@ Player physics, jumping, using weapons, getting hurt, healing but most of the ef
 
 # IF YOU WANT TO PLAY IN VR:
 
-1. Download the excellent TeamBeef VR mod here : [https://github.com/baggyg/BendyVR/releases](https://github.com/baggyg/BendyVR/releases)
-2. Install it following the instructions on the github page and **run the game once**.
-3. Download the latest release of the bhaptics mod here : [Mod zip file](https://github.com/Astienth/BendyInkMachine_bHaptics/releases/download/1.0/BendyInkMachine_bHaptics.zip)
-4. Extract it into the game folder under **\Bepinex\plugins**.
-5. Turn your bhaptics devices on and run the game.
+1. **If you already installed the VR mod from TeamBeef, uninstall it**, this zip contains the full vr mod and bhaptics mod.
+2. Download the zip file [BendyInkMachine_bHaptics_withVR.zip](https://github.com/Astienth/BendyInkMachine_bHaptics/releases/download/1.0/BendyInkMachine_bHaptics_withVR.zip)
+3. Extract it into the game folder, the folder that contains Bendy and the Ink Machine.exe
+4. Turn your bhaptics devices on and run the game.
 
 
 # IF YOU WANT TO PLAY FLAT (Original game):
@@ -30,6 +27,6 @@ Player physics, jumping, using weapons, getting hurt, healing but most of the ef
 
 2. Run the game once so that Bepinex creates its folders. Exit the game.
 
-3. **Download** the bhaptics [Mod zip file](https://github.com/Astienth/BendyInkMachine_bHaptics/releases/download/1.0/BendyInkMachine_bHaptics.zip) and **extract** into the game folder under **\Bepinex\plugins**.
+3. **Download** the zip file [BendyInkMachine_bHaptics.zip](https://github.com/Astienth/BendyInkMachine_bHaptics/releases/download/1.0/BendyInkMachine_bHaptics.zip) and **extract** into the game folder under **\Bepinex\plugins**.
 
 4. Turn your bhaptics devices on and run the game.
