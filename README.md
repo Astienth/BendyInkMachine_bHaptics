@@ -9,7 +9,7 @@ This mod adds bhaptics (vest, arms and tactvisor) support to the game Bendy and 
 
 # Effects
 
-Player physics, jumping, using weapons, getting hurt, healing but most of the effects are events based like jumpscares and spoky events 😨 
+Player physics, jumping, using weapons, getting hurt, healing but most of the effects are events based like jumpscares and spooky events 😨 
 
 # Installation
 
